@@ -57,8 +57,7 @@ function calcularRanking(partidos, partidosHoy, predicciones) {
 
     if (!partido) return;
 
-    // 🚨 si el partido no tiene resultado aún
-    if (partido.goles_local === "" || partido.goles_visitante === "") return;
+    if (!partido.goles_local || !partido.goles_visitante) return;
 
     let puntos = 0;
 
@@ -69,9 +68,11 @@ function calcularRanking(partidos, partidosHoy, predicciones) {
       puntos = 3;
     } else {
       let ganadorReal = Math.sign(
-        partido.goles_local - partido.goles_visitante,
+        Number(partido.goles_local) - Number(partido.goles_visitante),
       );
-      let ganadorPred = Math.sign(pr.pred_local - pr.pred_visitante);
+      let ganadorPred = Math.sign(
+        Number(pr.pred_local) - Number(pr.pred_visitante),
+      );
 
       if (ganadorReal == ganadorPred) {
         puntos = 1;
@@ -84,11 +85,7 @@ function calcularRanking(partidos, partidosHoy, predicciones) {
 
     ranking[pr.jugador].total += puntos;
 
-    let esPartidoHoy = partidosHoy.find(
-      (p) => String(p.id) === String(pr.partido_id),
-    );
-
-    if (esPartidoHoy) {
+    if (partidosHoy.find((p) => String(p.id) === String(pr.partido_id))) {
       ranking[pr.jugador].hoy += puntos;
     }
   });
