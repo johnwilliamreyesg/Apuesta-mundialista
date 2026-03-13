@@ -6,6 +6,7 @@ async function cargarDatos() {
   const predicciones = await fetch(
     "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones",
   ).then((r) => r.json());
+
   const totalPuntosJugadores = await fetch(
     "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores",
   ).then((r) => r.json());
@@ -18,7 +19,7 @@ async function cargarDatos() {
 
   mostrarApuestas(partidosHoy, predicciones);
 
-  calcularRanking(partidos, partidosHoy, predicciones);
+  calcularRanking(partidosHoy, predicciones, totalPuntosJugadores);
 }
 
 function mostrarPartidos(partidos) {
