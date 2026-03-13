@@ -58,9 +58,11 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
 
   // base: puntos acumulados
   jugadores.forEach((j) => {
-    ranking[j.jugador] = {
+    let jugador = j.jugador.trim();
+
+    ranking[jugador] = {
       hoy: 0,
-      total: Number(j.puntos),
+      total: Number(j.puntos || 0),
     };
   });
 
@@ -78,12 +80,14 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
       pr.pred_visitante == partido.goles_visitante;
 
     if (acertoExacto) {
-      if (!ranking[pr.jugador]) {
-        ranking[pr.jugador] = { hoy: 0, total: 0 };
+      let jugador = pr.jugador.trim();
+
+      if (!ranking[jugador]) {
+        ranking[jugador] = { hoy: 0, total: 0 };
       }
 
-      ranking[pr.jugador].hoy += 1;
-      ranking[pr.jugador].total += 1;
+      ranking[jugador].hoy += 1;
+      ranking[jugador].total += 1;
     }
   });
 
