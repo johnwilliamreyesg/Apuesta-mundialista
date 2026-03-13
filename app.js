@@ -57,6 +57,9 @@ function calcularRanking(partidos, partidosHoy, predicciones) {
 
     if (!partido) return;
 
+    // 🚨 si el partido no tiene resultado aún
+    if (partido.goles_local === "" || partido.goles_visitante === "") return;
+
     let puntos = 0;
 
     if (
