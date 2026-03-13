@@ -1,0 +1,39 @@
+body {
+  font-family: system-ui;
+  background: #0a1f44;
+  color: white;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+table {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+  border-collapse: collapse;
+  background: white;
+  color: black;
+}
+
+th {
+  background: #1e40af;
+  color: white;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+@media (max-width: 600px) {
+  table {
+    font-size: 14px;
+  }
+}
