@@ -56,7 +56,10 @@ section {
   color: white;
   border-radius: 6px;
 }
-
+.cargandoDatos {
+  color: white;
+  font-size: larger;
+}
 @media (max-width: 600px) {
   table {
     width: 95%;
