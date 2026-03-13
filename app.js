@@ -6,6 +6,9 @@ async function cargarDatos() {
   const predicciones = await fetch(
     "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones",
   ).then((r) => r.json());
+  const totalPuntosJugadores = await fetch(
+    "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores",
+  ).then((r) => r.json());
 
   const hoy = new Date().toISOString().slice(0, 10);
 
@@ -49,44 +52,37 @@ function mostrarApuestas(partidos, predicciones) {
   });
 }
 
-function calcularRanking(partidos, partidosHoy, predicciones) {
+function calcularRanking(partidosHoy, predicciones, jugadores) {
   let ranking = {};
 
+  // base: puntos acumulados
+  jugadores.forEach((j) => {
+    ranking[j.jugador] = {
+      hoy: 0,
+      total: Number(j.puntos),
+    };
+  });
+
   predicciones.forEach((pr) => {
-    let partido = partidos.find((p) => String(p.id) === String(pr.partido_id));
+    let partido = partidosHoy.find(
+      (p) => String(p.id) === String(pr.partido_id),
+    );
 
     if (!partido) return;
 
-    if (!partido.goles_local || !partido.goles_visitante) return;
+    if (partido.goles_local === "" || partido.goles_visitante === "") return;
 
-    let puntos = 0;
-
-    if (
+    let acertoExacto =
       pr.pred_local == partido.goles_local &&
-      pr.pred_visitante == partido.goles_visitante
-    ) {
-      puntos = 3;
-    } else {
-      let ganadorReal = Math.sign(
-        Number(partido.goles_local) - Number(partido.goles_visitante),
-      );
-      let ganadorPred = Math.sign(
-        Number(pr.pred_local) - Number(pr.pred_visitante),
-      );
+      pr.pred_visitante == partido.goles_visitante;
 
-      if (ganadorReal == ganadorPred) {
-        puntos = 1;
+    if (acertoExacto) {
+      if (!ranking[pr.jugador]) {
+        ranking[pr.jugador] = { hoy: 0, total: 0 };
       }
-    }
 
-    if (!ranking[pr.jugador]) {
-      ranking[pr.jugador] = { hoy: 0, total: 0 };
-    }
-
-    ranking[pr.jugador].total += puntos;
-
-    if (partidosHoy.find((p) => String(p.id) === String(pr.partido_id))) {
-      ranking[pr.jugador].hoy += puntos;
+      ranking[pr.jugador].hoy += 1;
+      ranking[pr.jugador].total += 1;
     }
   });
 
@@ -96,18 +92,27 @@ function calcularRanking(partidos, partidosHoy, predicciones) {
 function mostrarRanking(ranking) {
   let tabla = document.querySelector("#ranking tbody");
 
+  tabla.innerHTML = "";
+
   let lista = Object.entries(ranking);
 
+  // ordenar por total
   lista.sort((a, b) => b[1].total - a[1].total);
 
-  lista.forEach((j) => {
+  lista.forEach((j, index) => {
+    let medalla = "";
+
+    if (index === 0) medalla = "🥇";
+    if (index === 1) medalla = "🥈";
+    if (index === 2) medalla = "🥉";
+
     tabla.innerHTML += `
-<tr>
-<td>${j[0]}</td>
-<td>${j[1].hoy}</td>
-<td>${j[1].total}</td>
-</tr>
-`;
+    <tr>
+      <td>${medalla} ${j[0]}</td>
+      <td>${j[1].hoy}</td>
+      <td>${j[1].total}</td>
+    </tr>
+    `;
   });
 }
 
