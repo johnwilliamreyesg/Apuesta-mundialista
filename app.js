@@ -4,9 +4,9 @@ async function cargarDatos() {
     (r) => r.json(),
   );
 
-  const partidos = data.partidos;
-  const predicciones = data.predicciones;
-  const jugadores = data.jugadores;
+  const partidos = data[0];
+  const predicciones = data[1];
+  const jugadores = data[2];
 
   // crear firma de los datos
   const nuevaVersion = JSON.stringify(partidos) + JSON.stringify(predicciones);
