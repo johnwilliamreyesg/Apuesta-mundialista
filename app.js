@@ -15,7 +15,7 @@ async function cargarDatos() {
 
   mostrarApuestas(partidosHoy, predicciones);
 
-  calcularRanking(partidosHoy, predicciones);
+  calcularRanking(partidos, partidosHoy, predicciones);
 }
 
 function mostrarPartidos(partidos) {
@@ -49,7 +49,7 @@ function mostrarApuestas(partidos, predicciones) {
   });
 }
 
-function calcularRanking(partidos, predicciones) {
+function calcularRanking(partidos, partidosHoy, predicciones) {
   let ranking = {};
 
   predicciones.forEach((pr) => {
@@ -79,8 +79,15 @@ function calcularRanking(partidos, predicciones) {
       ranking[pr.jugador] = { hoy: 0, total: 0 };
     }
 
-    ranking[pr.jugador].hoy += puntos;
     ranking[pr.jugador].total += puntos;
+
+    let esPartidoHoy = partidosHoy.find(
+      (p) => String(p.id) === String(pr.partido_id),
+    );
+
+    if (esPartidoHoy) {
+      ranking[pr.jugador].hoy += puntos;
+    }
   });
 
   mostrarRanking(ranking);
