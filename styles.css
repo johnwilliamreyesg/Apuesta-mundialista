@@ -10,6 +10,7 @@ h1 {
   text-align: center;
   margin-bottom: 40px;
 }
+
 h2 {
   text-align: center;
 }
@@ -17,31 +18,32 @@ h2 {
 table {
   border-collapse: collapse;
   width: 60%;
+  margin: auto;
   margin-bottom: 30px;
 }
 
 th,
 td {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: 1px solid #1b3f8b;
+  padding: 10px;
   text-align: center;
 }
 
 th {
-  background-color: #222;
-  color: white;
+  background-color: #081735;
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #132c63;
 }
 
 tr:hover {
-  background-color: #ddd;
+  background-color: #1b3f8b;
 }
 
 @media (max-width: 600px) {
   table {
+    width: 95%;
     font-size: 14px;
   }
 }
