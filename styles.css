@@ -66,3 +66,15 @@ section {
     font-size: 14px;
   }
 }
+.cambioRanking {
+  animation: resaltar 1s ease;
+}
+
+@keyframes resaltar {
+  0% {
+    background-color: #ffe066;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
