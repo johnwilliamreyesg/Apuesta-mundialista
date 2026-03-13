@@ -1,15 +1,22 @@
+let ultimaVersion = "";
 async function cargarDatos() {
-  const [partidos, predicciones, jugadores] = await Promise.all([
-    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos").then((r) =>
-      r.json(),
-    ),
-    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones").then(
-      (r) => r.json(),
-    ),
-    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores").then((r) =>
-      r.json(),
-    ),
-  ]);
+  const data = await fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo").then(
+    (r) => r.json(),
+  );
+
+  const partidos = data.partidos;
+  const predicciones = data.predicciones;
+  const jugadores = data.jugadores;
+
+  // crear firma de los datos
+  const nuevaVersion = JSON.stringify(partidos) + JSON.stringify(predicciones);
+
+  // si no cambió nada, no recalcular
+  if (nuevaVersion === ultimaVersion) {
+    return;
+  }
+
+  ultimaVersion = nuevaVersion;
 
   const hoy = new Date().toISOString().slice(0, 10);
 
@@ -20,7 +27,6 @@ async function cargarDatos() {
   mostrarApuestas(partidosHoy, predicciones);
 
   calcularRanking(partidosHoy, predicciones, jugadores);
-  document.getElementById("cargando").style.display = "none";
 }
 
 function mostrarPartidos(partidos) {
