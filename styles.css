@@ -44,6 +44,18 @@ section {
   text-align: center;
   margin-bottom: 40px;
 }
+.acierto td:last-child {
+  background: #28a745;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.fallo td:last-child {
+  background: #dc3545;
+  color: white;
+  border-radius: 6px;
+}
 
 @media (max-width: 600px) {
   table {

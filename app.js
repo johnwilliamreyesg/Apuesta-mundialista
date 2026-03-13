@@ -38,19 +38,34 @@ function mostrarPartidos(partidos) {
 function mostrarApuestas(partidos, predicciones) {
   let tabla = document.querySelector("#tablaApuestas tbody");
 
+  let html = "";
+
   predicciones.forEach((pr) => {
     let partido = partidos.find((p) => String(p.id) === String(pr.partido_id));
 
     if (!partido) return;
 
-    tabla.innerHTML += `
-<tr>
+    let clase = "";
+
+    // verificar si el partido ya tiene resultado
+    if (partido.goles_local && partido.goles_visitante) {
+      let acertoExacto =
+        Number(pr.pred_local) === Number(partido.goles_local) &&
+        Number(pr.pred_visitante) === Number(partido.goles_visitante);
+
+      clase = acertoExacto ? "acierto" : "fallo";
+    }
+
+    html += `
+<tr class="${clase}">
 <td>${pr.jugador}</td>
 <td>${partido.local} vs ${partido.visitante}</td>
 <td>${pr.pred_local}-${pr.pred_visitante}</td>
 </tr>
 `;
   });
+
+  tabla.innerHTML = html;
 }
 
 function calcularRanking(partidosHoy, predicciones, jugadores) {
