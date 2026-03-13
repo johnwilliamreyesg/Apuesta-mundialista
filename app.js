@@ -1,4 +1,5 @@
 async function cargarDatos() {
+  mostrarUltimaActualizacion();
   const partidos = await fetch(
     "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos",
   ).then((r) => r.json());
@@ -24,6 +25,7 @@ async function cargarDatos() {
 
 function mostrarPartidos(partidos) {
   let tabla = document.querySelector("#tablaPartidos tbody");
+  tabla.innerHTML = "";
 
   partidos.forEach((p) => {
     tabla.innerHTML += `
@@ -135,5 +137,17 @@ function mostrarRanking(ranking) {
     `;
   });
 }
+function mostrarUltimaActualizacion() {
+  const ahora = new Date();
 
-cargarDatos();
+  const fecha = ahora.toLocaleDateString("es-CO", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  document.getElementById("ultimaActualizacion").textContent =
+    `Última actualización: ${fecha}`;
+}
+
+setInterval(cargarDatos, 30000);
