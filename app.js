@@ -1,9 +1,9 @@
 async function cargarDatos() {
   const partidos = await fetch(
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5fKhafUlyUgea0EnaEz8MaE0sDNmkMjSW6FrJeAI2b3mHnnM_-zix4fs9HrT_-06pZavItvwISAjq/pubhtml?gid=0&single=true",
+    "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos",
   ).then((r) => r.json());
   const predicciones = await fetch(
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5fKhafUlyUgea0EnaEz8MaE0sDNmkMjSW6FrJeAI2b3mHnnM_-zix4fs9HrT_-06pZavItvwISAjq/pubhtml?gid=848995688&single=true",
+    "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones",
   ).then((r) => r.json());
 
   let ranking = {};
