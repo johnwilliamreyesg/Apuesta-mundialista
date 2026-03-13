@@ -7,16 +7,19 @@ async function cargarDatos() {
   const partidos = data[0];
   const predicciones = data[1];
   const jugadores = data[2];
+  console.log("partidos", partidos);
+  console.log("predicciones", predicciones);
+  console.log("jugadores", jugadores);
 
-  // crear firma de los datos
-  const nuevaVersion = JSON.stringify(partidos) + JSON.stringify(predicciones);
+  // // crear firma de los datos
+  // const nuevaVersion = JSON.stringify(partidos) + JSON.stringify(predicciones);
 
-  // si no cambió nada, no recalcular
-  if (nuevaVersion === ultimaVersion) {
-    return;
-  }
+  // // si no cambió nada, no recalcular
+  // if (nuevaVersion === ultimaVersion) {
+  //   return;
+  // }
 
-  ultimaVersion = nuevaVersion;
+  // ultimaVersion = nuevaVersion;
 
   const hoy = new Date().toISOString().slice(0, 10);
 
@@ -156,4 +159,4 @@ function mostrarUltimaActualizacion() {
     `Última actualización: ${fecha}`;
 }
 
-setInterval(cargarDatos, 30000);
+setInterval(cargarDatos, 300000);
