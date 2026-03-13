@@ -1,16 +1,15 @@
 async function cargarDatos() {
-  mostrarUltimaActualizacion();
-  const partidos = await fetch(
-    "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos",
-  ).then((r) => r.json());
-
-  const predicciones = await fetch(
-    "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones",
-  ).then((r) => r.json());
-
-  const totalPuntosJugadores = await fetch(
-    "https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores",
-  ).then((r) => r.json());
+  const [partidos, predicciones, jugadores] = await Promise.all([
+    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos").then((r) =>
+      r.json(),
+    ),
+    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones").then(
+      (r) => r.json(),
+    ),
+    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores").then((r) =>
+      r.json(),
+    ),
+  ]);
 
   const hoy = new Date().toISOString().slice(0, 10);
 
@@ -20,7 +19,8 @@ async function cargarDatos() {
 
   mostrarApuestas(partidosHoy, predicciones);
 
-  calcularRanking(partidosHoy, predicciones, totalPuntosJugadores);
+  calcularRanking(partidosHoy, predicciones, jugadores);
+  document.getElementById("cargando").style.display = "none";
 }
 
 function mostrarPartidos(partidos) {
