@@ -116,7 +116,7 @@ function mostrarRanking(ranking) {
 
   const lista = Object.entries(ranking);
   lista.sort((a, b) => b[1].total - a[1].total);
-  const max = lista[0][1].total;
+  const max = lista[0][1].total || 1;
 
   lista.forEach((j, index) => {
     const jugador = j[0];
