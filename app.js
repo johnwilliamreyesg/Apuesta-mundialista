@@ -18,16 +18,13 @@ async function cargarDatos() {
   const partidosHoy = partidos.filter((p) => p.fecha === hoy);
 
   mostrarPartidos(partidosHoy);
-
   mostrarApuestas(partidosHoy, predicciones);
-
   calcularRanking(partidosHoy, predicciones, jugadores);
-
   mostrarUltimaActualizacion();
 }
 
 function mostrarPartidos(partidos) {
-  let tabla = document.querySelector("#tablaPartidos tbody");
+  const tabla = document.querySelector("#tablaPartidos tbody");
   tabla.innerHTML = "";
 
   partidos.forEach((p) => {
@@ -41,18 +38,20 @@ function mostrarPartidos(partidos) {
 }
 
 function mostrarApuestas(partidos, predicciones) {
-  let tabla = document.querySelector("#tablaApuestas tbody");
+  const tabla = document.querySelector("#tablaApuestas tbody");
   let html = "";
 
   predicciones.forEach((pr) => {
-    let partido = partidos.find((p) => String(p.id) === String(pr.partido_id));
+    const partido = partidos.find(
+      (p) => String(p.id) === String(pr.partido_id),
+    );
 
     if (!partido) return;
 
     let clase = "";
 
-    if (partido.goles_local && partido.goles_visitante) {
-      let acertoExacto =
+    if (partido.goles_local !== "" && partido.goles_visitante !== "") {
+      const acertoExacto =
         Number(pr.pred_local) === Number(partido.goles_local) &&
         Number(pr.pred_visitante) === Number(partido.goles_visitante);
 
@@ -72,10 +71,10 @@ function mostrarApuestas(partidos, predicciones) {
 }
 
 function calcularRanking(partidosHoy, predicciones, jugadores) {
-  let ranking = {};
+  const ranking = {};
 
   jugadores.forEach((j) => {
-    let jugador = j.jugador.trim();
+    const jugador = j.jugador.trim();
 
     ranking[jugador] = {
       hoy: 0,
@@ -84,7 +83,7 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
   });
 
   predicciones.forEach((pr) => {
-    let partido = partidosHoy.find(
+    const partido = partidosHoy.find(
       (p) => String(p.id) === String(pr.partido_id),
     );
 
@@ -92,12 +91,12 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
 
     if (partido.goles_local === "" || partido.goles_visitante === "") return;
 
-    let acertoExacto =
+    const acertoExacto =
       Number(pr.pred_local) === Number(partido.goles_local) &&
       Number(pr.pred_visitante) === Number(partido.goles_visitante);
 
     if (acertoExacto) {
-      let jugador = pr.jugador.trim();
+      const jugador = pr.jugador.trim();
 
       if (!ranking[jugador]) {
         ranking[jugador] = { hoy: 0, total: 0 };
@@ -112,16 +111,16 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
 }
 
 function mostrarRanking(ranking) {
-  let tabla = document.querySelector("#ranking tbody");
+  const tabla = document.querySelector("#ranking tbody");
   tabla.innerHTML = "";
 
-  let lista = Object.entries(ranking);
-
+  const lista = Object.entries(ranking);
   lista.sort((a, b) => b[1].total - a[1].total);
+  const max = lista[0][1].total;
 
   lista.forEach((j, index) => {
-    let jugador = j[0];
-    let puntos = j[1].total;
+    const jugador = j[0];
+    const datos = j[1];
 
     let medalla = "";
 
@@ -131,15 +130,22 @@ function mostrarRanking(ranking) {
 
     let clase = "";
 
-    if (rankingAnterior[jugador] && rankingAnterior[jugador] !== puntos) {
+    if (rankingAnterior[jugador] && rankingAnterior[jugador] !== datos.total) {
       clase = "cambioRanking";
     }
 
     tabla.innerHTML += `
 <tr class="${clase}">
 <td>${medalla} ${jugador}</td>
-<td>${j[1].hoy}</td>
-<td>${j[1].total}</td>
+<td>${datos.hoy}</td>
+<td>
+  <div class="barra-container">
+    <div class="barra-fondo">
+      <div class="barra" style="width:${(datos.total / max) * 120}px"></div>
+    </div>
+    <span class="puntos">${datos.total}</span>
+  </div>
+</td>
 </tr>
 `;
   });

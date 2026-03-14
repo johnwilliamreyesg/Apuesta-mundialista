@@ -56,10 +56,7 @@ section {
   color: white;
   border-radius: 6px;
 }
-.cargandoDatos {
-  color: white;
-  font-size: larger;
-}
+
 @media (max-width: 600px) {
   table {
     width: 95%;
@@ -67,7 +64,19 @@ section {
   }
 }
 .cambioRanking {
-  animation: resaltar 1s ease;
+  background-color: #1e7e34;
+  color: white;
+  animation: cambio 1s ease;
+}
+
+@keyframes cambio {
+  0% {
+    transform: scale(1.05);
+    background-color: #28a745;
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes resaltar {
@@ -77,4 +86,58 @@ section {
   100% {
     background-color: transparent;
   }
+}
+.subio {
+  background-color: #1e7e34 !important;
+  color: white;
+  animation: subir 1s ease;
+}
+
+.bajo {
+  background-color: #c82333 !important;
+  color: white;
+  animation: bajar 1s ease;
+}
+
+@keyframes subir {
+  0% {
+    transform: translateY(10px);
+    background-color: #28a745;
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bajar {
+  0% {
+    transform: translateY(-10px);
+    background-color: #dc3545;
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+.barra-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barra {
+  height: 12px;
+  background: #1e6cff;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+
+.barra-fondo {
+  width: 120px;
+  background: #1a2f5f;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.puntos {
+  font-weight: bold;
 }
