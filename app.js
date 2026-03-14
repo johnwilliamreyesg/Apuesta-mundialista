@@ -18,9 +18,11 @@ async function cargarDatos() {
     console.log("PREDICCIONES", predicciones);
     console.log("JUGADORES", jugadores);
 
-    const hoy = new Date().toISOString().slice(0, 10);
+    const hoy = new Date().toLocaleDateString("sv-SE", {
+      timeZone: "America/Bogota",
+    });
 
-    const partidosHoy = partidos.filter((p) => p.fecha === hoy);
+    const partidosHoy = partidos.filter((p) => p.fecha?.includes(hoy));
 
     mostrarPartidos(partidosHoy);
     mostrarApuestas(partidosHoy, predicciones);
