@@ -1,26 +1,34 @@
 let rankingAnterior = {};
 
 async function cargarDatos() {
-  const [partidos, predicciones, jugadores] = await Promise.all([
-    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos").then((r) =>
-      r.json(),
-    ),
-    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones").then(
-      (r) => r.json(),
-    ),
-    fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores").then((r) =>
-      r.json(),
-    ),
-  ]);
+  try {
+    const [partidos, predicciones, jugadores] = await Promise.all([
+      fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos").then(
+        (r) => r.json(),
+      ),
+      fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones").then(
+        (r) => r.json(),
+      ),
+      fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores").then(
+        (r) => r.json(),
+      ),
+    ]);
 
-  const hoy = new Date().toISOString().slice(0, 10);
+    console.log("PARTIDOS", partidos);
+    console.log("PREDICCIONES", predicciones);
+    console.log("JUGADORES", jugadores);
 
-  const partidosHoy = partidos.filter((p) => p.fecha === hoy);
+    const hoy = new Date().toISOString().slice(0, 10);
 
-  mostrarPartidos(partidosHoy);
-  mostrarApuestas(partidosHoy, predicciones);
-  calcularRanking(partidosHoy, predicciones, jugadores);
-  mostrarUltimaActualizacion();
+    const partidosHoy = partidos.filter((p) => p.fecha === hoy);
+
+    mostrarPartidos(partidosHoy);
+    mostrarApuestas(partidosHoy, predicciones);
+    calcularRanking(partidosHoy, predicciones, jugadores);
+    mostrarUltimaActualizacion();
+  } catch (error) {
+    console.error("ERROR CARGANDO DATOS:", error);
+  }
 }
 
 function mostrarPartidos(partidos) {
