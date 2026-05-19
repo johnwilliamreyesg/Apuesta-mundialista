@@ -3,15 +3,15 @@ let rankingAnterior = {};
 async function cargarDatos() {
   try {
     const [partidos, predicciones, jugadores] = await Promise.all([
-      fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=partidos").then(
-        (r) => r.json(),
-      ),
-      fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=predicciones").then(
-        (r) => r.json(),
-      ),
-      fetch("https://sheetdb.io/api/v1/7l6jlsm3n56yo?sheet=jugadores").then(
-        (r) => r.json(),
-      ),
+      fetch(
+        "https://script.google.com/macros/s/AKfycbz_V7R3TbcISWrW_WDGEL8OIYsOuRkznp11egpNSa781tagBRvMPbC6d-QTfPYkZ9W4wA/exec?sheet=partidos",
+      ).then((r) => r.json()),
+      fetch(
+        "https://script.google.com/macros/s/AKfycbz_V7R3TbcISWrW_WDGEL8OIYsOuRkznp11egpNSa781tagBRvMPbC6d-QTfPYkZ9W4wA/exec?sheet=predicciones",
+      ).then((r) => r.json()),
+      fetch(
+        "https://script.google.com/macros/s/AKfycbz_V7R3TbcISWrW_WDGEL8OIYsOuRkznp11egpNSa781tagBRvMPbC6d-QTfPYkZ9W4wA/exec?sheet=jugadores",
+      ).then((r) => r.json()),
     ]);
 
     console.log("PARTIDOS", partidos);
