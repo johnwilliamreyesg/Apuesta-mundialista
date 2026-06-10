@@ -1,6 +1,10 @@
 body {
   font-family: system-ui;
-  background: #0a1f44;
+  background-color: #0a1f44;
+  background-image: url('https://images4.alphacoders.com/140/thumb-1920-1407643.png');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
   color: white;
   margin: 0;
   padding: 20px;
@@ -9,10 +13,12 @@ body {
 h1 {
   text-align: center;
   margin-bottom: 40px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 h2 {
   text-align: center;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 table {
@@ -43,6 +49,10 @@ tr:hover {
 section {
   text-align: center;
   margin-bottom: 40px;
+  background: rgba(8, 23, 53, 0.45);
+  border-radius: 12px;
+  padding: 16px 8px;
+  backdrop-filter: blur(4px);
 }
 .acierto td:last-child {
   background: #28a745;

@@ -217,15 +217,17 @@ function fetchSheet(sheet) {
 // ─── Carga principal ──────────────────────────────────────────────────────────
 async function cargarDatos() {
   try {
-    const [partidos, predicciones, jugadores] = await Promise.all([
+    const [partidos, predicciones, jugadores, apuesta] = await Promise.all([
       fetchSheet("partidos"),
       fetchSheet("predicciones"),
       fetchSheet("jugadores"),
+      fetchSheet("apuesta"),
     ]);
 
     console.log("PARTIDOS", partidos);
     console.log("PREDICCIONES", predicciones);
     console.log("JUGADORES", jugadores);
+    console.log("APUESTA", apuesta);
 
     const hoy = new Date().toLocaleDateString("sv-SE", {
       timeZone: "America/Bogota",
@@ -234,6 +236,7 @@ async function cargarDatos() {
     const partidosHoy = partidos.filter((p) => p.fecha?.includes(hoy));
 
     mostrarPartidos(partidosHoy);
+    mostrarApuestaGeneral(apuesta);
     mostrarApuestas(partidosHoy, predicciones);
     calcularRanking(partidosHoy, predicciones, jugadores);
     mostrarUltimaActualizacion();
@@ -260,6 +263,29 @@ function mostrarPartidos(partidos) {
       </tr>
     `;
   });
+}
+
+// ─── Render de apuesta del torneo ────────────────────────────────────────────
+function mostrarApuestaGeneral(apuestas) {
+  const tabla = document.querySelector("#tablaApuesta tbody");
+
+  if (!apuestas || apuestas.length === 0) {
+    tabla.innerHTML = `<tr><td colspan="5">Sin apuestas registradas.</td></tr>`;
+    return;
+  }
+
+  tabla.innerHTML = apuestas
+    .map(
+      (a) => `
+      <tr>
+        <td>${a["Jugador"] ?? a["jugador"] ?? ""}</td>
+        <td>${a["Campeón"] ?? a["campeon"] ?? a["Campeon"] ?? ""}</td>
+        <td>${a["Subcampeón"] ?? a["subcampeon"] ?? a["Subcampeon"] ?? ""}</td>
+        <td>${a["Tercero"] ?? a["tercero"] ?? ""}</td>
+        <td>${a["Cuarto"] ?? a["cuarto"] ?? ""}</td>
+      </tr>`,
+    )
+    .join("");
 }
 
 // ─── Render de apuestas ───────────────────────────────────────────────────────
