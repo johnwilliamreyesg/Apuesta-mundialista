@@ -237,7 +237,7 @@ async function cargarDatos() {
 
     mostrarPartidos(partidosHoy);
     mostrarApuestaGeneral(apuesta);
-    mostrarApuestas(partidosHoy, predicciones);
+    mostrarApuestas(partidos, predicciones);
     calcularRanking(partidosHoy, predicciones, jugadores);
     mostrarUltimaActualizacion();
   } catch (error) {
@@ -291,43 +291,136 @@ function mostrarApuestaGeneral(apuestas) {
 // ─── Render de apuestas ───────────────────────────────────────────────────────
 function mostrarApuestas(partidos, predicciones) {
   const tabla = document.querySelector("#tablaApuestas tbody");
+  const hoy = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Bogota" });
   let html = "";
 
   predicciones.forEach((pr) => {
     const partido = partidos.find(
       (p) => String(p.id) === String(pr.partido_id),
     );
-
     if (!partido) return;
 
-    let clase = "";
+    const abierto = partido.estado?.trim().toLowerCase() === "abierto";
+    const esHoy = partido.fecha?.includes(hoy);
 
-    if (partido.goles_local !== "" && partido.goles_visitante !== "") {
+    if (!abierto && !esHoy) return;
+
+    let clase = "";
+    if (!abierto && partido.goles_local !== "" && partido.goles_visitante !== "") {
       const acertoExacto =
         Number(pr.pred_local) === Number(partido.goles_local) &&
         Number(pr.pred_visitante) === Number(partido.goles_visitante);
-
       clase = acertoExacto ? "acierto" : "fallo";
     }
 
     let clasePrimerGol = "";
-    if (partido.primer_gol && pr.primer_gol) {
-      clasePrimerGol = pr.primer_gol.trim().toLowerCase() === partido.primer_gol.trim().toLowerCase()
-        ? "acierto-gol" : "fallo-gol";
+    if (!abierto && partido.primer_gol && pr.primer_gol) {
+      clasePrimerGol =
+        pr.primer_gol.trim().toLowerCase() === partido.primer_gol.trim().toLowerCase()
+          ? "acierto-gol"
+          : "fallo-gol";
     }
+
+    const valLocal = pr.pred_local !== undefined && pr.pred_local !== "" ? pr.pred_local : "";
+    const valVisitante = pr.pred_visitante !== undefined && pr.pred_visitante !== "" ? pr.pred_visitante : "";
+    const valGol = pr.primer_gol || "";
+
+    const tdPrediccion = abierto
+      ? `<td>
+           <input type="number" class="inp-local" min="0" max="20" value="${valLocal}" placeholder="L">
+           &nbsp;-&nbsp;
+           <input type="number" class="inp-visitante" min="0" max="20" value="${valVisitante}" placeholder="V">
+         </td>`
+      : `<td>${valLocal !== "" ? valLocal + "-" + valVisitante : "—"}</td>`;
+
+    const tdPrimerGol = abierto
+      ? `<td>
+           <select class="inp-primer-gol">
+             <option value="">— equipo —</option>
+             <option value="${partido.local}"  ${valGol === partido.local    ? "selected" : ""}>${partido.local}</option>
+             <option value="${partido.visitante}" ${valGol === partido.visitante ? "selected" : ""}>${partido.visitante}</option>
+           </select>
+         </td>`
+      : `<td class="${clasePrimerGol}">${valGol || "—"}</td>`;
+
+    const tdAccion = abierto
+      ? `<td><button class="btn-guardar" onclick="guardarPrediccion('${pr.partido_id}', '${pr.jugador}', this)">Guardar</button></td>`
+      : `<td>—</td>`;
 
     html += `
       <tr class="${clase}">
         <td>${pr.jugador}</td>
         <td>${partido.local} vs ${partido.visitante}</td>
-        <td>${pr.pred_local}-${pr.pred_visitante}</td>
-        <td class="${clasePrimerGol}">${pr.primer_gol || "—"}</td>
+        ${tdPrediccion}
+        ${tdPrimerGol}
+        ${tdAccion}
       </tr>
     `;
   });
 
-  tabla.innerHTML =
-    html || `<tr><td colspan="4">Sin apuestas para hoy.</td></tr>`;
+  tabla.innerHTML = html || `<tr><td colspan="5">Sin apuestas disponibles.</td></tr>`;
+}
+
+// ─── Guardar predicción via JSONP ─────────────────────────────────────────────
+function guardarPrediccion(partidoId, jugador, btn) {
+  const fila = btn.closest("tr");
+  const predLocal = fila.querySelector(".inp-local").value;
+  const predVisitante = fila.querySelector(".inp-visitante").value;
+  const primerGol = fila.querySelector(".inp-primer-gol")?.value || "";
+
+  if (predLocal === "" || predVisitante === "") {
+    alert("Ingresa el marcador completo antes de guardar.");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Guardando...";
+
+  const callbackName = "cb_save_" + Date.now();
+  const script = document.createElement("script");
+  script.src =
+    `${BASE_URL}?action=updatePrediccion` +
+    `&partido_id=${encodeURIComponent(partidoId)}` +
+    `&jugador=${encodeURIComponent(jugador)}` +
+    `&pred_local=${encodeURIComponent(predLocal)}` +
+    `&pred_visitante=${encodeURIComponent(predVisitante)}` +
+    `&primer_gol=${encodeURIComponent(primerGol)}` +
+    `&callback=${callbackName}`;
+
+  window[callbackName] = (resp) => {
+    delete window[callbackName];
+    script.remove();
+    btn.disabled = false;
+    if (resp && resp.ok) {
+      btn.textContent = "✓ Guardado";
+      btn.style.background = "#28a745";
+      setTimeout(() => {
+        btn.textContent = "Guardar";
+        btn.style.background = "";
+      }, 2500);
+    } else {
+      btn.textContent = "Error";
+      btn.style.background = "#dc3545";
+      setTimeout(() => {
+        btn.textContent = "Guardar";
+        btn.style.background = "";
+      }, 3000);
+      alert("Error al guardar: " + (resp?.error || "Intenta de nuevo."));
+    }
+  };
+
+  script.onerror = () => {
+    delete window[callbackName];
+    script.remove();
+    btn.disabled = false;
+    btn.textContent = "Error";
+    setTimeout(() => {
+      btn.textContent = "Guardar";
+    }, 3000);
+    alert("Error de conexión. Verifica tu internet.");
+  };
+
+  document.head.appendChild(script);
 }
 
 // ─── Cálculo de ranking ───────────────────────────────────────────────────────

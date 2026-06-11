@@ -28,10 +28,6 @@ table {
   margin-bottom: 30px;
 }
 
-#tablaApuestas {
-  width: 80%;
-}
-
 th,
 td {
   border: 1px solid #1b3f8b;
@@ -57,7 +53,13 @@ section {
   border-radius: 12px;
   padding: 16px 8px;
   backdrop-filter: blur(4px);
+  overflow-x: auto;
 }
+
+#tablaApuestas {
+  width: 95%;
+}
+
 .acierto td:nth-child(3) {
   background: #28a745;
   color: white;
@@ -145,6 +147,62 @@ section {
     transform: translateY(0);
   }
 }
+.inp-local,
+.inp-visitante {
+  width: 45px;
+  padding: 4px 2px;
+  text-align: center;
+  background: #1a2f5f;
+  color: white;
+  border: 1px solid #3a5da8;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.inp-primer-gol {
+  width: 130px;
+  padding: 4px 6px;
+  background: #1a2f5f;
+  color: white;
+  border: 1px solid #3a5da8;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.inp-primer-gol option {
+  background: #0d1f44;
+  color: white;
+}
+
+.inp-local:focus,
+.inp-visitante:focus,
+.inp-primer-gol:focus {
+  outline: none;
+  border-color: #1e6cff;
+  background: #1f3a73;
+}
+
+.btn-guardar {
+  background: #1e6cff;
+  color: white;
+  border: none;
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.btn-guardar:hover:not(:disabled) {
+  background: #1558cc;
+}
+
+.btn-guardar:disabled {
+  background: #555;
+  cursor: default;
+}
+
 .barra-container {
   display: flex;
   align-items: center;
