@@ -75,6 +75,7 @@ function mostrarPartidos(partidos) {
       <tr>
         <td>${p.local} vs ${p.visitante}</td>
         <td>${p.goles_local !== "" ? p.goles_local + "-" + p.goles_visitante : "—"}</td>
+        <td>${p.primer_gol || "—"}</td>
       </tr>
     `;
   });
