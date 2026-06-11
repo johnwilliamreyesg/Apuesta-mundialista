@@ -1,192 +1,6 @@
-// let rankingAnterior = {};
-
-// async function cargarDatos() {
-//   try {
-//     const [partidos, predicciones, jugadores] = await Promise.all([
-//       fetch(
-//         "https://script.google.com/macros/s/AKfycbyXrmBpx5py6kh62qq20a96Sywv-K22iJBHRpMZvFG-htGn38x0tWobY904smTaqf3rBQ/exec?sheet=partidos",
-//       ).then((r) => r.json()),
-//       fetch(
-//         "https://script.google.com/macros/s/AKfycbyXrmBpx5py6kh62qq20a96Sywv-K22iJBHRpMZvFG-htGn38x0tWobY904smTaqf3rBQ/exec?sheet=predicciones",
-//       ).then((r) => r.json()),
-//       fetch(
-//         "https://script.google.com/macros/s/AKfycbyXrmBpx5py6kh62qq20a96Sywv-K22iJBHRpMZvFG-htGn38x0tWobY904smTaqf3rBQ/exec?sheet=jugadores",
-//       ).then((r) => r.json()),
-//     ]);
-
-//     console.log("PARTIDOS", partidos);
-//     console.log("PREDICCIONES", predicciones);
-//     console.log("JUGADORES", jugadores);
-
-//     const hoy = new Date().toLocaleDateString("sv-SE", {
-//       timeZone: "America/Bogota",
-//     });
-
-//     const partidosHoy = partidos.filter((p) => p.fecha?.includes(hoy));
-
-//     mostrarPartidos(partidosHoy);
-//     mostrarApuestas(partidosHoy, predicciones);
-//     calcularRanking(partidosHoy, predicciones, jugadores);
-//     mostrarUltimaActualizacion();
-//   } catch (error) {
-//     console.error("ERROR CARGANDO DATOS:", error);
-//   }
-// }
-
-// function mostrarPartidos(partidos) {
-//   const tabla = document.querySelector("#tablaPartidos tbody");
-//   tabla.innerHTML = "";
-
-//   partidos.forEach((p) => {
-//     tabla.innerHTML += `
-// <tr>
-// <td>${p.local} vs ${p.visitante}</td>
-// <td>${p.goles_local}-${p.goles_visitante}</td>
-// </tr>
-// `;
-//   });
-// }
-
-// function mostrarApuestas(partidos, predicciones) {
-//   const tabla = document.querySelector("#tablaApuestas tbody");
-//   let html = "";
-
-//   predicciones.forEach((pr) => {
-//     const partido = partidos.find(
-//       (p) => String(p.id) === String(pr.partido_id),
-//     );
-
-//     if (!partido) return;
-
-//     let clase = "";
-
-//     if (partido.goles_local !== "" && partido.goles_visitante !== "") {
-//       const acertoExacto =
-//         Number(pr.pred_local) === Number(partido.goles_local) &&
-//         Number(pr.pred_visitante) === Number(partido.goles_visitante);
-
-//       clase = acertoExacto ? "acierto" : "fallo";
-//     }
-
-//     html += `
-// <tr class="${clase}">
-// <td>${pr.jugador}</td>
-// <td>${partido.local} vs ${partido.visitante}</td>
-// <td>${pr.pred_local}-${pr.pred_visitante}</td>
-// </tr>
-// `;
-//   });
-
-//   tabla.innerHTML = html;
-// }
-
-// function calcularRanking(partidosHoy, predicciones, jugadores) {
-//   const ranking = {};
-
-//   jugadores.forEach((j) => {
-//     const jugador = j.jugador.trim();
-
-//     ranking[jugador] = {
-//       hoy: 0,
-//       total: Number(j.puntos || 0),
-//     };
-//   });
-
-//   predicciones.forEach((pr) => {
-//     const partido = partidosHoy.find(
-//       (p) => String(p.id) === String(pr.partido_id),
-//     );
-
-//     if (!partido) return;
-
-//     if (partido.goles_local === "" || partido.goles_visitante === "") return;
-
-//     const acertoExacto =
-//       Number(pr.pred_local) === Number(partido.goles_local) &&
-//       Number(pr.pred_visitante) === Number(partido.goles_visitante);
-
-//     if (acertoExacto) {
-//       const jugador = pr.jugador.trim();
-
-//       if (!ranking[jugador]) {
-//         ranking[jugador] = { hoy: 0, total: 0 };
-//       }
-
-//       ranking[jugador].hoy += 1;
-//       ranking[jugador].total += 1;
-//     }
-//   });
-
-//   mostrarRanking(ranking);
-// }
-
-// function mostrarRanking(ranking) {
-//   const tabla = document.querySelector("#ranking tbody");
-//   tabla.innerHTML = "";
-
-//   const lista = Object.entries(ranking);
-//   lista.sort((a, b) => b[1].total - a[1].total);
-//   const max = lista[0][1].total || 1;
-
-//   lista.forEach((j, index) => {
-//     const jugador = j[0];
-//     const datos = j[1];
-
-//     let medalla = "";
-
-//     if (index === 0) medalla = "🥇";
-//     if (index === 1) medalla = "🥈";
-//     if (index === 2) medalla = "🥉";
-
-//     let clase = "";
-
-//     if (rankingAnterior[jugador] && rankingAnterior[jugador] !== datos.total) {
-//       clase = "cambioRanking";
-//     }
-
-//     tabla.innerHTML += `
-// <tr class="${clase}">
-// <td>${medalla} ${jugador}</td>
-// <td>${datos.hoy}</td>
-// <td>
-//   <div class="barra-container">
-//     <div class="barra-fondo">
-//       <div class="barra" style="width:${(datos.total / max) * 120}px"></div>
-//     </div>
-//     <span class="puntos">${datos.total}</span>
-//   </div>
-// </td>
-// </tr>
-// `;
-//   });
-
-//   rankingAnterior = {};
-
-//   lista.forEach((j) => {
-//     rankingAnterior[j[0]] = j[1].total;
-//   });
-// }
-
-// function mostrarUltimaActualizacion() {
-//   const ahora = new Date();
-
-//   const fecha = ahora.toLocaleDateString("es-CO", {
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//   });
-
-//   document.getElementById("ultimaActualizacion").textContent =
-//     `Última actualización: ${fecha}`;
-// }
-
-// cargarDatos();
-
-// setInterval(cargarDatos, 30000);
-
 // ⚙️ Cambia esta URL por la nueva que genera Apps Script al redesplegar
 const BASE_URL =
-  "https://script.google.com/macros/s/AKfycbxJldgHBhLoYMHEDXVGdGE_Sxsd-qDB8wrarqX1QphpINe_cY7SZeIRvbfGOdum0Ix-NA/exec";
+  "https://script.google.com/macros/s/AKfycbw7u1LHkmxrirG7UUZq6s15NrPmmm5Zy7pMm4zaqQ6WhpR0uJanblThMYRaUKLc_TwY/exec";
 
 let rankingAnterior = {};
 
@@ -291,7 +105,9 @@ function mostrarApuestaGeneral(apuestas) {
 // ─── Render de apuestas ───────────────────────────────────────────────────────
 function mostrarApuestas(partidos, predicciones) {
   const tabla = document.querySelector("#tablaApuestas tbody");
-  const hoy = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Bogota" });
+  const hoy = new Date().toLocaleDateString("sv-SE", {
+    timeZone: "America/Bogota",
+  });
   let html = "";
 
   predicciones.forEach((pr) => {
@@ -306,7 +122,11 @@ function mostrarApuestas(partidos, predicciones) {
     if (!abierto && !esHoy) return;
 
     let clase = "";
-    if (!abierto && partido.goles_local !== "" && partido.goles_visitante !== "") {
+    if (
+      !abierto &&
+      partido.goles_local !== "" &&
+      partido.goles_visitante !== ""
+    ) {
       const acertoExacto =
         Number(pr.pred_local) === Number(partido.goles_local) &&
         Number(pr.pred_visitante) === Number(partido.goles_visitante);
@@ -316,13 +136,18 @@ function mostrarApuestas(partidos, predicciones) {
     let clasePrimerGol = "";
     if (!abierto && partido.primer_gol && pr.primer_gol) {
       clasePrimerGol =
-        pr.primer_gol.trim().toLowerCase() === partido.primer_gol.trim().toLowerCase()
+        pr.primer_gol.trim().toLowerCase() ===
+        partido.primer_gol.trim().toLowerCase()
           ? "acierto-gol"
           : "fallo-gol";
     }
 
-    const valLocal = pr.pred_local !== undefined && pr.pred_local !== "" ? pr.pred_local : "";
-    const valVisitante = pr.pred_visitante !== undefined && pr.pred_visitante !== "" ? pr.pred_visitante : "";
+    const valLocal =
+      pr.pred_local !== undefined && pr.pred_local !== "" ? pr.pred_local : "";
+    const valVisitante =
+      pr.pred_visitante !== undefined && pr.pred_visitante !== ""
+        ? pr.pred_visitante
+        : "";
     const valGol = pr.primer_gol || "";
 
     const tdPrediccion = abierto
@@ -337,7 +162,7 @@ function mostrarApuestas(partidos, predicciones) {
       ? `<td>
            <select class="inp-primer-gol">
              <option value="">— equipo —</option>
-             <option value="${partido.local}"  ${valGol === partido.local    ? "selected" : ""}>${partido.local}</option>
+             <option value="${partido.local}"  ${valGol === partido.local ? "selected" : ""}>${partido.local}</option>
              <option value="${partido.visitante}" ${valGol === partido.visitante ? "selected" : ""}>${partido.visitante}</option>
            </select>
          </td>`
@@ -358,7 +183,8 @@ function mostrarApuestas(partidos, predicciones) {
     `;
   });
 
-  tabla.innerHTML = html || `<tr><td colspan="5">Sin apuestas disponibles.</td></tr>`;
+  tabla.innerHTML =
+    html || `<tr><td colspan="5">Sin apuestas disponibles.</td></tr>`;
 }
 
 // ─── Guardar predicción via JSONP ─────────────────────────────────────────────
@@ -455,8 +281,12 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
       ranking[jugador].total += 1;
     }
 
-    if (partido.primer_gol && pr.primer_gol &&
-        pr.primer_gol.trim().toLowerCase() === partido.primer_gol.trim().toLowerCase()) {
+    if (
+      partido.primer_gol &&
+      pr.primer_gol &&
+      pr.primer_gol.trim().toLowerCase() ===
+        partido.primer_gol.trim().toLowerCase()
+    ) {
       ranking[jugador].hoy += 1;
       ranking[jugador].total += 1;
     }
