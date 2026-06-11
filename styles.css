@@ -207,6 +207,12 @@ section {
   cursor: default;
 }
 
+.sin-apuesta {
+  color: #aaa;
+  font-style: italic;
+  font-size: 12px;
+}
+
 .puntos-ok {
   text-align: center;
   color: #28a745;

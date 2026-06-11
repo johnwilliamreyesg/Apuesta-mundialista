@@ -151,13 +151,15 @@ function mostrarApuestas(partidos, predicciones) {
         : "";
     const valGol = pr.primer_gol || "";
 
+    const tienePred = valLocal !== "" && valVisitante !== "";
+
     const tdPrediccion = abierto
       ? `<td>
            <input type="number" class="inp-local" min="0" max="20" value="${valLocal}" placeholder="L">
            &nbsp;-&nbsp;
            <input type="number" class="inp-visitante" min="0" max="20" value="${valVisitante}" placeholder="V">
          </td>`
-      : `<td>${valLocal !== "" ? valLocal + "-" + valVisitante : "—"}</td>`;
+      : `<td>${tienePred ? valLocal + "-" + valVisitante : '<span class="sin-apuesta">No apostó</span>'}</td>`;
 
     const tdPrimerGol = abierto
       ? `<td>
@@ -269,6 +271,10 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
 
     if (!partido) return;
     if (partido.goles_local === "" || partido.goles_visitante === "") return;
+
+    // Sin predicción ingresada → no puntúa
+    if (pr.pred_local === "" || pr.pred_local === null || pr.pred_local === undefined ||
+        pr.pred_visitante === "" || pr.pred_visitante === null || pr.pred_visitante === undefined) return;
 
     const acertoExacto =
       Number(pr.pred_local) === Number(partido.goles_local) &&
