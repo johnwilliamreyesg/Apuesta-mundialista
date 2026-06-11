@@ -310,17 +310,24 @@ function mostrarApuestas(partidos, predicciones) {
       clase = acertoExacto ? "acierto" : "fallo";
     }
 
+    let clasePrimerGol = "";
+    if (partido.primer_gol && pr.primer_gol) {
+      clasePrimerGol = pr.primer_gol.trim().toLowerCase() === partido.primer_gol.trim().toLowerCase()
+        ? "acierto-gol" : "fallo-gol";
+    }
+
     html += `
       <tr class="${clase}">
         <td>${pr.jugador}</td>
         <td>${partido.local} vs ${partido.visitante}</td>
         <td>${pr.pred_local}-${pr.pred_visitante}</td>
+        <td class="${clasePrimerGol}">${pr.primer_gol || "—"}</td>
       </tr>
     `;
   });
 
   tabla.innerHTML =
-    html || `<tr><td colspan="3">Sin apuestas para hoy.</td></tr>`;
+    html || `<tr><td colspan="4">Sin apuestas para hoy.</td></tr>`;
 }
 
 // ─── Cálculo de ranking ───────────────────────────────────────────────────────
@@ -347,9 +354,16 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
       Number(pr.pred_local) === Number(partido.goles_local) &&
       Number(pr.pred_visitante) === Number(partido.goles_visitante);
 
+    const jugador = pr.jugador.trim();
+    if (!ranking[jugador]) ranking[jugador] = { hoy: 0, total: 0 };
+
     if (acertoExacto) {
-      const jugador = pr.jugador.trim();
-      if (!ranking[jugador]) ranking[jugador] = { hoy: 0, total: 0 };
+      ranking[jugador].hoy += 1;
+      ranking[jugador].total += 1;
+    }
+
+    if (partido.primer_gol && pr.primer_gol &&
+        pr.primer_gol.trim().toLowerCase() === partido.primer_gol.trim().toLowerCase()) {
       ranking[jugador].hoy += 1;
       ranking[jugador].total += 1;
     }

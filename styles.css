@@ -54,15 +54,28 @@ section {
   padding: 16px 8px;
   backdrop-filter: blur(4px);
 }
-.acierto td:last-child {
+.acierto td:nth-child(3) {
   background: #28a745;
   color: white;
   font-weight: bold;
   border-radius: 6px;
 }
 
-.fallo td:last-child {
+.fallo td:nth-child(3) {
   background: #dc3545;
+  color: white;
+  border-radius: 6px;
+}
+
+.acierto-gol {
+  background: #20c963;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.fallo-gol {
+  background: #e05260;
   color: white;
   border-radius: 6px;
 }
