@@ -183,6 +183,37 @@ section {
   background: #1f3a73;
 }
 
+.btn-guardar-jornada {
+  display: block;
+  margin: 16px auto 0;
+  background: #e6a817;
+  color: #0a1f44;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-guardar-jornada:hover:not(:disabled) {
+  background: #c98d0e;
+}
+
+.btn-guardar-jornada:disabled {
+  background: #555;
+  color: #aaa;
+  cursor: default;
+}
+
+.puntos-ok {
+  text-align: center;
+  color: #28a745;
+  font-weight: bold;
+  margin-top: 12px;
+}
+
 .btn-guardar {
   background: #1e6cff;
   color: white;

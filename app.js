@@ -3,6 +3,7 @@ const BASE_URL =
   "https://script.google.com/macros/s/AKfycbw7u1LHkmxrirG7UUZq6s15NrPmmm5Zy7pMm4zaqQ6WhpR0uJanblThMYRaUKLc_TwY/exec";
 
 let rankingAnterior = {};
+let puntosGuardados = false;
 
 // ─── JSONP helper: evita el bloqueo CORS de Apps Script ───────────────────────
 function fetchSheet(sheet) {
@@ -277,8 +278,8 @@ function calcularRanking(partidosHoy, predicciones, jugadores) {
     if (!ranking[jugador]) ranking[jugador] = { hoy: 0, total: 0 };
 
     if (acertoExacto) {
-      ranking[jugador].hoy += 1;
-      ranking[jugador].total += 1;
+      ranking[jugador].hoy += 3;
+      ranking[jugador].total += 3;
     }
 
     if (
@@ -341,6 +342,76 @@ function mostrarRanking(ranking) {
   rankingAnterior = {};
   lista.forEach((j) => {
     rankingAnterior[j[0]] = j[1].total;
+  });
+
+  // Mostrar botón de guardar jornada si hay puntos del día sin persistir
+  const divAccion = document.getElementById("accionPuntos");
+  const hayPuntosHoy = lista.some(([, d]) => d.hoy > 0);
+
+  if (hayPuntosHoy && !puntosGuardados) {
+    divAccion.innerHTML = `
+      <button id="btn-guardar-puntos" class="btn-guardar-jornada"
+              onclick="guardarPuntos(${JSON.stringify(lista.map(([j, d]) => ({ jugador: j, total: d.total })))})">
+        Guardar puntos de la jornada
+      </button>`;
+  } else if (puntosGuardados) {
+    divAccion.innerHTML = `<p class="puntos-ok">✓ Puntos de la jornada guardados</p>`;
+  } else {
+    divAccion.innerHTML = "";
+  }
+}
+
+// ─── Persistir puntos en jugadores sheet ──────────────────────────────────────
+function guardarPuntos(jugadoresConTotal) {
+  if (puntosGuardados) return;
+
+  const btn = document.getElementById("btn-guardar-puntos");
+  btn.disabled = true;
+  btn.textContent = "Guardando...";
+
+  let completados = 0;
+  let errores = 0;
+  const total = jugadoresConTotal.length;
+
+  jugadoresConTotal.forEach(({ jugador, total: puntos }) => {
+    const cbName = "cb_pts_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+    script.src =
+      `${BASE_URL}?action=updatePuntos` +
+      `&jugador=${encodeURIComponent(jugador)}` +
+      `&puntos=${encodeURIComponent(puntos)}` +
+      `&callback=${cbName}`;
+
+    window[cbName] = (resp) => {
+      delete window[cbName];
+      script.remove();
+      completados++;
+      if (!resp?.ok) errores++;
+
+      if (completados === total) {
+        if (errores === 0) {
+          puntosGuardados = true;
+          document.getElementById("accionPuntos").innerHTML =
+            `<p class="puntos-ok">✓ Puntos de la jornada guardados</p>`;
+        } else {
+          btn.disabled = false;
+          btn.textContent = "Reintentar";
+        }
+      }
+    };
+
+    script.onerror = () => {
+      delete window[cbName];
+      script.remove();
+      completados++;
+      errores++;
+      if (completados === total) {
+        btn.disabled = false;
+        btn.textContent = "Error — Reintentar";
+      }
+    };
+
+    document.head.appendChild(script);
   });
 }
 
