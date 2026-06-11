@@ -1,6 +1,6 @@
 // ⚙️ Cambia esta URL por la nueva que genera Apps Script al redesplegar
 const BASE_URL =
-  "https://script.google.com/macros/s/AKfycbw7u1LHkmxrirG7UUZq6s15NrPmmm5Zy7pMm4zaqQ6WhpR0uJanblThMYRaUKLc_TwY/exec";
+  "https://script.google.com/macros/s/AKfycbzWBJ5KQO5bgDCmCMVGjHqUoC6j8T4nPD71wU_D6oxWVcT8z7w3wb7CFcsFXmjUQAU4Jw/exec";
 
 let rankingAnterior = {};
 let puntosGuardados = false;
@@ -172,7 +172,7 @@ function mostrarApuestas(partidos, predicciones) {
       : `<td class="${clasePrimerGol}">${valGol || "—"}</td>`;
 
     const tdAccion = abierto
-      ? `<td><button class="btn-guardar" onclick="guardarPrediccion('${pr.partido_id}', '${pr.jugador}', this)">Guardar</button></td>`
+      ? `<td><button class="btn-guardar" onclick="guardarPrediccion(${pr._row}, '${pr.jugador}', this)">Guardar</button></td>`
       : `<td>—</td>`;
 
     html += `
@@ -191,7 +191,7 @@ function mostrarApuestas(partidos, predicciones) {
 }
 
 // ─── Guardar predicción via JSONP ─────────────────────────────────────────────
-function guardarPrediccion(partidoId, jugador, btn) {
+function guardarPrediccion(row, jugador, btn) {
   const fila = btn.closest("tr");
   const predLocal = fila.querySelector(".inp-local").value;
   const predVisitante = fila.querySelector(".inp-visitante").value;
@@ -209,7 +209,7 @@ function guardarPrediccion(partidoId, jugador, btn) {
   const script = document.createElement("script");
   script.src =
     `${BASE_URL}?action=updatePrediccion` +
-    `&partido_id=${encodeURIComponent(partidoId)}` +
+    `&row=${encodeURIComponent(row)}` +
     `&jugador=${encodeURIComponent(jugador)}` +
     `&pred_local=${encodeURIComponent(predLocal)}` +
     `&pred_visitante=${encodeURIComponent(predVisitante)}` +
