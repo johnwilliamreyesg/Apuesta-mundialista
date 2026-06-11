@@ -186,7 +186,7 @@
 
 // ⚙️ Cambia esta URL por la nueva que genera Apps Script al redesplegar
 const BASE_URL =
-  "https://script.google.com/macros/s/AKfycbwDR3V4d5-1yuRKV7b7P7Sdqun2LcE0ekc-tCBFNEHEL4ijViZ4deik-5oWB5Pc_6JZcg/exec";
+  "https://script.google.com/macros/s/AKfycbxJldgHBhLoYMHEDXVGdGE_Sxsd-qDB8wrarqX1QphpINe_cY7SZeIRvbfGOdum0Ix-NA/exec";
 
 let rankingAnterior = {};
 
