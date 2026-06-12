@@ -32,11 +32,12 @@ function fetchSheet(sheet) {
 // ─── Carga principal ──────────────────────────────────────────────────────────
 async function cargarDatos() {
   try {
-    const [partidos, predicciones, jugadores, apuesta] = await Promise.all([
+    const [partidos, predicciones, jugadores, apuesta, historial] = await Promise.all([
       fetchSheet("partidos"),
       fetchSheet("predicciones"),
       fetchSheet("jugadores"),
       fetchSheet("apuesta"),
+      fetchSheet("historial"),
     ]);
 
     console.log("PARTIDOS", partidos);
@@ -53,7 +54,7 @@ async function cargarDatos() {
     mostrarPartidos(partidosHoy);
     mostrarApuestaGeneral(apuesta);
     mostrarApuestas(partidos, predicciones);
-    calcularRanking(partidosHoy, predicciones, jugadores);
+    calcularRanking(partidosHoy, predicciones, jugadores, historial);
     mostrarUltimaActualizacion();
   } catch (error) {
     console.error("ERROR CARGANDO DATOS:", error);
@@ -254,51 +255,69 @@ function guardarPrediccion(row, jugador, btn) {
 }
 
 // ─── Cálculo de ranking ───────────────────────────────────────────────────────
-function calcularRanking(partidosHoy, predicciones, jugadores) {
+function calcularRanking(partidosHoy, predicciones, jugadores, historial) {
+  const hoyFecha = new Date().toLocaleDateString("sv-SE", {
+    timeZone: "America/Bogota",
+  });
+
+  // Si ya hay datos en historial para hoy, los puntos ya están sumados en jugadores
+  const yaGuardadoHoy = historial.some(
+    (h) => h[hoyFecha] !== undefined && h[hoyFecha] !== "",
+  );
+  if (yaGuardadoHoy) puntosGuardados = true;
+
   const ranking = {};
 
   jugadores.forEach((j) => {
     const jugador = j.jugador.trim();
+    const historRow = historial.find(
+      (h) => h.jugador?.toString().trim() === jugador,
+    );
     ranking[jugador] = {
-      hoy: 0,
+      // Si ya está guardado, tomar hoy del historial; total ya lo incluye en jugadores
+      hoy: yaGuardadoHoy ? Number(historRow?.[hoyFecha] || 0) : 0,
       total: Number(j.puntos || 0),
     };
   });
 
-  predicciones.forEach((pr) => {
-    const partido = partidosHoy.find(
-      (p) => String(p.id) === String(pr.partido_id),
-    );
+  // Solo calcular y sumar hoy si aún no se guardó
+  if (!yaGuardadoHoy) {
+    predicciones.forEach((pr) => {
+      const partido = partidosHoy.find(
+        (p) => String(p.id) === String(pr.partido_id),
+      );
 
-    if (!partido) return;
-    if (partido.goles_local === "" || partido.goles_visitante === "") return;
+      if (!partido) return;
+      if (partido.goles_local === "" || partido.goles_visitante === "") return;
 
-    // Sin predicción ingresada → no puntúa
-    if (pr.pred_local === "" || pr.pred_local === null || pr.pred_local === undefined ||
-        pr.pred_visitante === "" || pr.pred_visitante === null || pr.pred_visitante === undefined) return;
+      if (
+        pr.pred_local === "" || pr.pred_local === null || pr.pred_local === undefined ||
+        pr.pred_visitante === "" || pr.pred_visitante === null || pr.pred_visitante === undefined
+      ) return;
 
-    const acertoExacto =
-      Number(pr.pred_local) === Number(partido.goles_local) &&
-      Number(pr.pred_visitante) === Number(partido.goles_visitante);
+      const acertoExacto =
+        Number(pr.pred_local) === Number(partido.goles_local) &&
+        Number(pr.pred_visitante) === Number(partido.goles_visitante);
 
-    const jugador = pr.jugador.trim();
-    if (!ranking[jugador]) ranking[jugador] = { hoy: 0, total: 0 };
+      const jugador = pr.jugador.trim();
+      if (!ranking[jugador]) ranking[jugador] = { hoy: 0, total: 0 };
 
-    if (acertoExacto) {
-      ranking[jugador].hoy += 3;
-      ranking[jugador].total += 3;
-    }
+      if (acertoExacto) {
+        ranking[jugador].hoy += 3;
+        ranking[jugador].total += 3;
+      }
 
-    if (
-      partido.primer_gol &&
-      pr.primer_gol &&
-      pr.primer_gol.trim().toLowerCase() ===
-        partido.primer_gol.trim().toLowerCase()
-    ) {
-      ranking[jugador].hoy += 1;
-      ranking[jugador].total += 1;
-    }
-  });
+      if (
+        partido.primer_gol &&
+        pr.primer_gol &&
+        pr.primer_gol.trim().toLowerCase() ===
+          partido.primer_gol.trim().toLowerCase()
+      ) {
+        ranking[jugador].hoy += 1;
+        ranking[jugador].total += 1;
+      }
+    });
+  }
 
   mostrarRanking(ranking);
 }
