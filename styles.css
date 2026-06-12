@@ -74,14 +74,14 @@ section {
 }
 
 .acierto-gol {
-  background: #20c963;
+  background: #28a745;
   color: white;
   font-weight: bold;
   border-radius: 6px;
 }
 
 .fallo-gol {
-  background: #e05260;
+  background: #dc3545;
   color: white;
   border-radius: 6px;
 }
