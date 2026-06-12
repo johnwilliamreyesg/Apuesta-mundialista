@@ -358,7 +358,7 @@ function mostrarRanking(ranking) {
   if (hayPuntosHoy && !puntosGuardados) {
     divAccion.innerHTML = `
       <button id="btn-guardar-puntos" class="btn-guardar-jornada"
-              onclick="guardarPuntos(${JSON.stringify(lista.map(([j, d]) => ({ jugador: j, total: d.total })))})">
+              onclick="guardarPuntos(${JSON.stringify(lista.map(([j, d]) => ({ jugador: j, total: d.total, hoy: d.hoy })))})">
         Guardar puntos de la jornada
       </button>`;
   } else if (puntosGuardados) {
@@ -397,9 +397,7 @@ function guardarPuntos(jugadoresConTotal) {
 
       if (completados === total) {
         if (errores === 0) {
-          puntosGuardados = true;
-          document.getElementById("accionPuntos").innerHTML =
-            `<p class="puntos-ok">✓ Puntos de la jornada guardados</p>`;
+          guardarHistorial(jugadoresConTotal);
         } else {
           btn.disabled = false;
           btn.textContent = "Reintentar";
@@ -420,6 +418,53 @@ function guardarPuntos(jugadoresConTotal) {
 
     document.head.appendChild(script);
   });
+}
+
+// ─── Persistir puntos del día en hoja historial ───────────────────────────────
+function guardarHistorial(jugadoresConTotal) {
+  const fecha = new Date().toLocaleDateString("sv-SE", {
+    timeZone: "America/Bogota",
+  });
+  const datos = jugadoresConTotal.map(({ jugador, hoy }) => ({
+    jugador,
+    puntos: hoy,
+  }));
+
+  const cbName = "cb_hist_" + Date.now();
+  const script = document.createElement("script");
+  script.src =
+    `${BASE_URL}?action=updateHistorial` +
+    `&fecha=${encodeURIComponent(fecha)}` +
+    `&datos=${encodeURIComponent(JSON.stringify(datos))}` +
+    `&callback=${cbName}`;
+
+  window[cbName] = (resp) => {
+    delete window[cbName];
+    script.remove();
+    if (resp?.ok) {
+      puntosGuardados = true;
+      document.getElementById("accionPuntos").innerHTML =
+        `<p class="puntos-ok">✓ Puntos de la jornada guardados</p>`;
+    } else {
+      const btn = document.getElementById("btn-guardar-puntos");
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Error historial — Reintentar";
+      }
+    }
+  };
+
+  script.onerror = () => {
+    delete window[cbName];
+    script.remove();
+    const btn = document.getElementById("btn-guardar-puntos");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Error — Reintentar";
+    }
+  };
+
+  document.head.appendChild(script);
 }
 
 // ─── Última actualización ─────────────────────────────────────────────────────
