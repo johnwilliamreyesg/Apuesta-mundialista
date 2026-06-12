@@ -356,9 +356,10 @@ function mostrarRanking(ranking) {
   const hayPuntosHoy = lista.some(([, d]) => d.hoy > 0);
 
   if (hayPuntosHoy && !puntosGuardados) {
+    window._puntosData = lista.map(([j, d]) => ({ jugador: j, total: d.total, hoy: d.hoy }));
     divAccion.innerHTML = `
       <button id="btn-guardar-puntos" class="btn-guardar-jornada"
-              onclick="guardarPuntos(${JSON.stringify(lista.map(([j, d]) => ({ jugador: j, total: d.total, hoy: d.hoy })))})">
+              onclick="guardarPuntos(window._puntosData)">
         Guardar puntos de la jornada
       </button>`;
   } else if (puntosGuardados) {
