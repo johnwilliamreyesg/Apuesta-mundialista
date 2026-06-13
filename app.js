@@ -32,13 +32,14 @@ function fetchSheet(sheet) {
 // ─── Carga principal ──────────────────────────────────────────────────────────
 async function cargarDatos() {
   try {
-    const [partidos, predicciones, jugadores, apuesta, historial] = await Promise.all([
-      fetchSheet("partidos"),
-      fetchSheet("predicciones"),
-      fetchSheet("jugadores"),
-      fetchSheet("apuesta"),
-      fetchSheet("historial"),
-    ]);
+    const [partidos, predicciones, jugadores, apuesta, historial] =
+      await Promise.all([
+        fetchSheet("partidos"),
+        fetchSheet("predicciones"),
+        fetchSheet("jugadores"),
+        fetchSheet("apuesta"),
+        fetchSheet("historial"),
+      ]);
 
     console.log("PARTIDOS", partidos);
     console.log("PREDICCIONES", predicciones);
@@ -291,9 +292,14 @@ function calcularRanking(partidosHoy, predicciones, jugadores, historial) {
       if (partido.goles_local === "" || partido.goles_visitante === "") return;
 
       if (
-        pr.pred_local === "" || pr.pred_local === null || pr.pred_local === undefined ||
-        pr.pred_visitante === "" || pr.pred_visitante === null || pr.pred_visitante === undefined
-      ) return;
+        pr.pred_local === "" ||
+        pr.pred_local === null ||
+        pr.pred_local === undefined ||
+        pr.pred_visitante === "" ||
+        pr.pred_visitante === null ||
+        pr.pred_visitante === undefined
+      )
+        return;
 
       const acertoExacto =
         Number(pr.pred_local) === Number(partido.goles_local) &&
@@ -375,7 +381,11 @@ function mostrarRanking(ranking) {
   const hayPuntosHoy = lista.some(([, d]) => d.hoy > 0);
 
   if (hayPuntosHoy && !puntosGuardados) {
-    window._puntosData = lista.map(([j, d]) => ({ jugador: j, total: d.total, hoy: d.hoy }));
+    window._puntosData = lista.map(([j, d]) => ({
+      jugador: j,
+      total: d.total,
+      hoy: d.hoy,
+    }));
     divAccion.innerHTML = `
       <button id="btn-guardar-puntos" class="btn-guardar-jornada"
               onclick="guardarPuntos(window._puntosData)">
@@ -401,7 +411,8 @@ function guardarPuntos(jugadoresConTotal) {
   const total = jugadoresConTotal.length;
 
   jugadoresConTotal.forEach(({ jugador, total: puntos }) => {
-    const cbName = "cb_pts_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const cbName =
+      "cb_pts_" + Date.now() + "_" + Math.random().toString(36).slice(2);
     const script = document.createElement("script");
     script.src =
       `${BASE_URL}?action=updatePuntos` +
@@ -505,4 +516,4 @@ function mostrarUltimaActualizacion() {
 
 // ─── Arranque ─────────────────────────────────────────────────────────────────
 cargarDatos();
-setInterval(cargarDatos, 60000); // cada 60 segundos (antes 30s — ahorra requests)
+setInterval(cargarDatos, 300000); // cada 60 segundos (antes 30s — ahorra requests)
