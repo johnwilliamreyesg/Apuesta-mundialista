@@ -122,7 +122,7 @@ function mostrarApuestas(partidos, predicciones) {
     const abierto = partido.estado?.trim().toLowerCase() === "abierto";
     const esHoy = partido.fecha?.includes(hoy);
 
-    if (!abierto && !esHoy) return;
+    if (!esHoy) return;
 
     let clase = "";
     if (
