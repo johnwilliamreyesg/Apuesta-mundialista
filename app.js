@@ -289,30 +289,32 @@ function calcularRanking(partidosHoy, predicciones, jugadores, historial) {
       );
 
       if (!partido) return;
-      if (partido.goles_local === "" || partido.goles_visitante === "") return;
-
-      if (
-        pr.pred_local === "" ||
-        pr.pred_local === null ||
-        pr.pred_local === undefined ||
-        pr.pred_visitante === "" ||
-        pr.pred_visitante === null ||
-        pr.pred_visitante === undefined
-      )
-        return;
-
-      const acertoExacto =
-        Number(pr.pred_local) === Number(partido.goles_local) &&
-        Number(pr.pred_visitante) === Number(partido.goles_visitante);
 
       const jugador = pr.jugador.trim();
       if (!ranking[jugador]) ranking[jugador] = { hoy: 0, total: 0 };
 
-      if (acertoExacto) {
-        ranking[jugador].hoy += 3;
-        ranking[jugador].total += 3;
+      // Puntos por marcador exacto (solo si el partido tiene resultado y el jugador predijo)
+      const tieneResultado =
+        partido.goles_local !== "" && partido.goles_visitante !== "";
+      const tienePrediccion =
+        pr.pred_local !== "" &&
+        pr.pred_local !== null &&
+        pr.pred_local !== undefined &&
+        pr.pred_visitante !== "" &&
+        pr.pred_visitante !== null &&
+        pr.pred_visitante !== undefined;
+
+      if (tieneResultado && tienePrediccion) {
+        const acertoExacto =
+          Number(pr.pred_local) === Number(partido.goles_local) &&
+          Number(pr.pred_visitante) === Number(partido.goles_visitante);
+        if (acertoExacto) {
+          ranking[jugador].hoy += 3;
+          ranking[jugador].total += 3;
+        }
       }
 
+      // Punto por primer gol (independiente del marcador)
       if (
         partido.primer_gol &&
         pr.primer_gol &&
