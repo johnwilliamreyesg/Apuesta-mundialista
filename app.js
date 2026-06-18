@@ -168,6 +168,7 @@ function mostrarApuestas(partidos, predicciones) {
       ? `<td>
            <select class="inp-primer-gol">
              <option value="">— equipo —</option>
+             <option value="Ninguno" ${valGol === "Ninguno" ? "selected" : ""}>Ninguno</option>
              <option value="${partido.local}"  ${valGol === partido.local ? "selected" : ""}>${partido.local}</option>
              <option value="${partido.visitante}" ${valGol === partido.visitante ? "selected" : ""}>${partido.visitante}</option>
            </select>
