@@ -8,10 +8,10 @@ let puntosGuardados = false;
 // ─── JSONP helper: evita el bloqueo CORS de Apps Script ───────────────────────
 function fetchSheet(sheet) {
   return new Promise((resolve, reject) => {
-    const callbackName = "cb_" + sheet + "_" + Date.now();
+    const callbackName = "cb_" + sheet.replace(/\s+/g, "_") + "_" + Date.now();
     const script = document.createElement("script");
 
-    script.src = `${BASE_URL}?sheet=${sheet}&callback=${callbackName}`;
+    script.src = `${BASE_URL}?sheet=${encodeURIComponent(sheet)}&callback=${callbackName}`;
 
     window[callbackName] = (data) => {
       resolve(data);
@@ -32,13 +32,14 @@ function fetchSheet(sheet) {
 // ─── Carga principal ──────────────────────────────────────────────────────────
 async function cargarDatos() {
   try {
-    const [partidos, predicciones, jugadores, apuesta, historial] =
+    const [partidos, predicciones, jugadores, apuesta, historial, apuestaFernanda] =
       await Promise.all([
         fetchSheet("partidos"),
         fetchSheet("predicciones"),
         fetchSheet("jugadores"),
         fetchSheet("apuesta"),
         fetchSheet("historial"),
+        fetchSheet("apuesta de fernanda"),
       ]);
 
     console.log("PARTIDOS", partidos);
@@ -54,6 +55,7 @@ async function cargarDatos() {
 
     mostrarPartidos(partidosHoy);
     mostrarApuestaGeneral(apuesta);
+    mostrarApuestaFernanda(apuestaFernanda);
     mostrarApuestas(partidos, predicciones);
     calcularRanking(partidosHoy, predicciones, jugadores, historial);
     mostrarUltimaActualizacion();
@@ -86,6 +88,29 @@ function mostrarPartidos(partidos) {
 // ─── Render de apuesta del torneo ────────────────────────────────────────────
 function mostrarApuestaGeneral(apuestas) {
   const tabla = document.querySelector("#tablaApuesta tbody");
+
+  if (!apuestas || apuestas.length === 0) {
+    tabla.innerHTML = `<tr><td colspan="5">Sin apuestas registradas.</td></tr>`;
+    return;
+  }
+
+  tabla.innerHTML = apuestas
+    .map(
+      (a) => `
+      <tr>
+        <td>${a["Jugador"] ?? a["jugador"] ?? ""}</td>
+        <td>${a["Campeón"] ?? a["campeon"] ?? a["Campeon"] ?? ""}</td>
+        <td>${a["Subcampeón"] ?? a["subcampeon"] ?? a["Subcampeon"] ?? ""}</td>
+        <td>${a["Tercero"] ?? a["tercero"] ?? ""}</td>
+        <td>${a["Cuarto"] ?? a["cuarto"] ?? ""}</td>
+      </tr>`,
+    )
+    .join("");
+}
+
+// ─── Render de apuesta de Fernanda ───────────────────────────────────────────
+function mostrarApuestaFernanda(apuestas) {
+  const tabla = document.querySelector("#tablaApuestaFernanda tbody");
 
   if (!apuestas || apuestas.length === 0) {
     tabla.innerHTML = `<tr><td colspan="5">Sin apuestas registradas.</td></tr>`;
