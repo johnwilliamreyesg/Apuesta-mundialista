@@ -261,7 +261,7 @@ function guardarPrediccion(row, jugador, btn) {
   const visitante  = btn.dataset.visitante;
 
   if (predLocal === "" || predVisitante === "") {
-    alert("Ingresa el marcador completo antes de guardar.");
+    alert(`El inge dice:\n\n${jugador}, ingresa el marcador completo antes de guardar.`);
     return;
   }
 
@@ -272,18 +272,18 @@ function guardarPrediccion(row, jugador, btn) {
   // Equipo seleccionado como primer gol tiene 0 goles predichos → imposible
   if (primerGol && primerGol !== "Ninguno") {
     if (primerGol === local && golesLocal === 0) {
-      alert(`⚠️ Ojo: marcaste a ${local} como primer gol pero les pusiste 0 goles.\n¿Quisiste seleccionar a ${visitante}?\n\nCorrege el primer gol antes de guardar.`);
+      alert(`El inge dice:\n\n${jugador}, marcaste a ${local} como primer gol pero les pusiste 0 goles.\n¿Quisiste seleccionar a ${visitante}?\n\nCorrege el primer gol antes de guardar.`);
       return;
     }
     if (primerGol === visitante && golesVisitante === 0) {
-      alert(`⚠️ Ojo: marcaste a ${visitante} como primer gol pero les pusiste 0 goles.\n¿Quisiste seleccionar a ${local}?\n\nCorrege el primer gol antes de guardar.`);
+      alert(`El inge dice:\n\n${jugador}, marcaste a ${visitante} como primer gol pero les pusiste 0 goles.\n¿Quisiste seleccionar a ${local}?\n\nCorrege el primer gol antes de guardar.`);
       return;
     }
   }
 
   // Hay goles predichos pero no se eligió equipo para el primer gol
   if (totalGoles > 0 && (!primerGol || primerGol === "Ninguno")) {
-    alert(`⚠️ Pusiste ${golesLocal}-${golesVisitante} pero no seleccionaste quién hace el primer gol.\nElige ${local} o ${visitante}.`);
+    alert(`El inge dice:\n\n${jugador}, pusiste ${golesLocal}-${golesVisitante} pero no seleccionaste quién hace el primer gol.\nElige ${local} o ${visitante}.`);
     return;
   }
 
