@@ -291,7 +291,8 @@ function calcularRanking(partidosHoy, predicciones, jugadores, historial) {
   const yaGuardadoHoy = historial.some(
     (h) => h[hoyFecha] !== undefined && h[hoyFecha] !== "",
   );
-  if (yaGuardadoHoy) puntosGuardados = true;
+  const localKey = "puntosGuardados_" + hoyFecha;
+  if (yaGuardadoHoy || localStorage.getItem(localKey) === "true") puntosGuardados = true;
 
   const ranking = {};
 
@@ -430,6 +431,12 @@ function mostrarRanking(ranking) {
 function guardarPuntos(jugadoresConTotal) {
   if (puntosGuardados) return;
 
+  // Marcar inmediatamente para que refrescos o el intervalo no disparen un segundo guardado
+  const fecha = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Bogota" });
+  const localKey = "puntosGuardados_" + fecha;
+  puntosGuardados = true;
+  localStorage.setItem(localKey, "true");
+
   const btn = document.getElementById("btn-guardar-puntos");
   btn.disabled = true;
   btn.textContent = "Guardando...";
@@ -458,6 +465,8 @@ function guardarPuntos(jugadoresConTotal) {
         if (errores === 0) {
           guardarHistorial(jugadoresConTotal);
         } else {
+          puntosGuardados = false;
+          localStorage.removeItem(localKey);
           btn.disabled = false;
           btn.textContent = "Reintentar";
         }
@@ -470,6 +479,8 @@ function guardarPuntos(jugadoresConTotal) {
       completados++;
       errores++;
       if (completados === total) {
+        puntosGuardados = false;
+        localStorage.removeItem(localKey);
         btn.disabled = false;
         btn.textContent = "Error — Reintentar";
       }
