@@ -230,7 +230,10 @@ function mostrarApuestas(partidos, predicciones) {
       : `<td class="${clasePrimerGol}">${valGol || "—"}</td>`;
 
     const tdAccion = abierto
-      ? `<td><button class="btn-guardar" onclick="guardarPrediccion(${pr._row}, '${pr.jugador}', this)">Guardar</button></td>`
+      ? `<td><button class="btn-guardar"
+             data-local="${partido.local}"
+             data-visitante="${partido.visitante}"
+             onclick="guardarPrediccion(${pr._row}, '${pr.jugador}', this)">Guardar</button></td>`
       : `<td>—</td>`;
 
     html += `
@@ -250,13 +253,37 @@ function mostrarApuestas(partidos, predicciones) {
 
 // ─── Guardar predicción via JSONP ─────────────────────────────────────────────
 function guardarPrediccion(row, jugador, btn) {
-  const fila = btn.closest("tr");
-  const predLocal = fila.querySelector(".inp-local").value;
+  const fila       = btn.closest("tr");
+  const predLocal    = fila.querySelector(".inp-local").value;
   const predVisitante = fila.querySelector(".inp-visitante").value;
-  const primerGol = fila.querySelector(".inp-primer-gol")?.value || "";
+  const primerGol  = fila.querySelector(".inp-primer-gol")?.value || "";
+  const local      = btn.dataset.local;
+  const visitante  = btn.dataset.visitante;
 
   if (predLocal === "" || predVisitante === "") {
     alert("Ingresa el marcador completo antes de guardar.");
+    return;
+  }
+
+  const golesLocal     = Number(predLocal);
+  const golesVisitante = Number(predVisitante);
+  const totalGoles     = golesLocal + golesVisitante;
+
+  // Equipo seleccionado como primer gol tiene 0 goles predichos → imposible
+  if (primerGol && primerGol !== "Ninguno") {
+    if (primerGol === local && golesLocal === 0) {
+      alert(`⚠️ Ojo: marcaste a ${local} como primer gol pero les pusiste 0 goles.\n¿Quisiste seleccionar a ${visitante}?\n\nCorrege el primer gol antes de guardar.`);
+      return;
+    }
+    if (primerGol === visitante && golesVisitante === 0) {
+      alert(`⚠️ Ojo: marcaste a ${visitante} como primer gol pero les pusiste 0 goles.\n¿Quisiste seleccionar a ${local}?\n\nCorrege el primer gol antes de guardar.`);
+      return;
+    }
+  }
+
+  // Hay goles predichos pero no se eligió equipo para el primer gol
+  if (totalGoles > 0 && (!primerGol || primerGol === "Ninguno")) {
+    alert(`⚠️ Pusiste ${golesLocal}-${golesVisitante} pero no seleccionaste quién hace el primer gol.\nElige ${local} o ${visitante}.`);
     return;
   }
 
