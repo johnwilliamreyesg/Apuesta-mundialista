@@ -8,7 +8,14 @@
 
   <body>
     <h1>🏆 Apuesta Mundial 2026 - "Pólemica Recargado"</h1>
-    <section>
+    <div id="descanso" style="display:none">
+      <div class="descanso-ball">⚽</div>
+      <h2 class="descanso-titulo">El Mundial está de descanso</h2>
+      <p class="descanso-sub">Los jugadores descansan...<br>¿y tú ya revisaste el ranking? 😏</p>
+      <p id="proximoPartido" class="descanso-next"></p>
+    </div>
+
+    <section id="seccionPartidos">
       <h2>⚽ Partidos del día</h2>
 
       <table id="tablaPartidos">
@@ -57,7 +64,7 @@
       </table>
     </section>
 
-    <section>
+    <section id="seccionApuestas">
       <h2>🎯 Apuestas de jugadores</h2>
 
       <table id="tablaApuestas">

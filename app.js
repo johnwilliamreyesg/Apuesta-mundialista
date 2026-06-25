@@ -53,15 +53,44 @@ async function cargarDatos() {
 
     const partidosHoy = partidos.filter((p) => p.fecha?.includes(hoy));
 
-    mostrarPartidos(partidosHoy);
+    const hayJuegos = partidosHoy.length > 0;
+
+    document.getElementById("descanso").style.display       = hayJuegos ? "none" : "block";
+    document.getElementById("seccionPartidos").style.display = hayJuegos ? ""     : "none";
+    document.getElementById("seccionApuestas").style.display = hayJuegos ? ""     : "none";
+
+    if (hayJuegos) {
+      mostrarPartidos(partidosHoy);
+      mostrarApuestas(partidos, predicciones);
+    } else {
+      mostrarProximoPartido(partidos);
+    }
+
     mostrarApuestaGeneral(apuesta);
     mostrarApuestaFernanda(apuestaFernanda);
-    mostrarApuestas(partidos, predicciones);
     calcularRanking(partidosHoy, predicciones, jugadores, historial);
     mostrarUltimaActualizacion();
   } catch (error) {
     console.error("ERROR CARGANDO DATOS:", error);
   }
+}
+
+// ─── Próximo partido (día de descanso) ───────────────────────────────────────
+function mostrarProximoPartido(partidos) {
+  const hoy = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Bogota" });
+  const proximos = partidos
+    .filter((p) => p.fecha && p.fecha > hoy)
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+  const el = document.getElementById("proximoPartido");
+  if (!proximos.length) { el.textContent = ""; return; }
+
+  const p = proximos[0];
+  const fecha = new Date(p.fecha + "T12:00:00-05:00");
+  const fechaStr = fecha.toLocaleDateString("es-CO", {
+    weekday: "long", day: "numeric", month: "long", timeZone: "America/Bogota",
+  });
+  el.innerHTML = `⏳ Próximo partido: <strong>${p.local} vs ${p.visitante}</strong><br>${fechaStr}`;
 }
 
 // ─── Render de partidos ───────────────────────────────────────────────────────
