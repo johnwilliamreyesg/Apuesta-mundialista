@@ -401,20 +401,20 @@ function calcularRanking(partidosHoy, predicciones, jugadores, historial) {
           Number(pr.pred_local) === Number(partido.goles_local) &&
           Number(pr.pred_visitante) === Number(partido.goles_visitante);
         if (acertoExacto) {
-          ranking[jugador].hoy += 3;
-          ranking[jugador].total += 3;
+          ranking[jugador].hoy += 6;
+          ranking[jugador].total += 6;
         }
       }
 
-      // Punto por primer gol (independiente del marcador)
+      // Puntos por primer gol (independiente del marcador)
       if (
         partido.primer_gol &&
         pr.primer_gol &&
         pr.primer_gol.trim().toLowerCase() ===
           partido.primer_gol.trim().toLowerCase()
       ) {
-        ranking[jugador].hoy += 1;
-        ranking[jugador].total += 1;
+        ranking[jugador].hoy += 2;
+        ranking[jugador].total += 2;
       }
     });
   }
