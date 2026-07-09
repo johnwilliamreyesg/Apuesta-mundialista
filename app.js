@@ -404,6 +404,14 @@ function calcularRanking(partidosHoy, predicciones, jugadores, historial) {
           ranking[jugador].hoy += 6;
           ranking[jugador].total += 6;
         }
+
+        // 3 pts por acertar ganador o empate
+        const resultadoReal = Math.sign(Number(partido.goles_local) - Number(partido.goles_visitante));
+        const resultadoPred = Math.sign(Number(pr.pred_local) - Number(pr.pred_visitante));
+        if (resultadoReal === resultadoPred) {
+          ranking[jugador].hoy += 3;
+          ranking[jugador].total += 3;
+        }
       }
 
       // Puntos por primer gol (independiente del marcador)
