@@ -211,29 +211,35 @@ function mostrarApuestas(partidos, predicciones) {
     const tienePred = valLocal !== "" && valVisitante !== "";
 
     const tdPrediccion = abierto
-      ? `<td>
-           <input type="number" class="inp-local" min="0" max="20" value="${valLocal}" placeholder="L">
-           &nbsp;-&nbsp;
-           <input type="number" class="inp-visitante" min="0" max="20" value="${valVisitante}" placeholder="V">
-         </td>`
+      ? (tienePred
+          ? `<td><span class="pred-oculta">🔒 Apostado</span></td>`
+          : `<td>
+               <input type="number" class="inp-local" min="0" max="20" value="" placeholder="L">
+               &nbsp;-&nbsp;
+               <input type="number" class="inp-visitante" min="0" max="20" value="" placeholder="V">
+             </td>`)
       : `<td>${tienePred ? valLocal + "-" + valVisitante : '<span class="sin-apuesta">No apostó</span>'}</td>`;
 
     const tdPrimerGol = abierto
-      ? `<td>
-           <select class="inp-primer-gol">
-             <option value="">— equipo —</option>
-             <option value="Ninguno" ${valGol === "Ninguno" ? "selected" : ""}>Ninguno</option>
-             <option value="${partido.local}"  ${valGol === partido.local ? "selected" : ""}>${partido.local}</option>
-             <option value="${partido.visitante}" ${valGol === partido.visitante ? "selected" : ""}>${partido.visitante}</option>
-           </select>
-         </td>`
+      ? (tienePred
+          ? `<td><span class="pred-oculta">🔒</span></td>`
+          : `<td>
+               <select class="inp-primer-gol">
+                 <option value="">— equipo —</option>
+                 <option value="Ninguno">Ninguno</option>
+                 <option value="${partido.local}">${partido.local}</option>
+                 <option value="${partido.visitante}">${partido.visitante}</option>
+               </select>
+             </td>`)
       : `<td class="${clasePrimerGol}">${valGol || "—"}</td>`;
 
     const tdAccion = abierto
-      ? `<td><button class="btn-guardar"
-             data-local="${partido.local}"
-             data-visitante="${partido.visitante}"
-             onclick="guardarPrediccion(${pr._row}, '${pr.jugador}', this)">Guardar</button></td>`
+      ? (tienePred
+          ? `<td>—</td>`
+          : `<td><button class="btn-guardar"
+               data-local="${partido.local}"
+               data-visitante="${partido.visitante}"
+               onclick="guardarPrediccion(${pr._row}, '${pr.jugador}', this)">Guardar</button></td>`)
       : `<td>—</td>`;
 
     html += `
@@ -306,12 +312,15 @@ function guardarPrediccion(row, jugador, btn) {
     script.remove();
     btn.disabled = false;
     if (resp && resp.ok) {
-      btn.textContent = "✓ Guardado";
-      btn.style.background = "#28a745";
-      setTimeout(() => {
-        btn.textContent = "Guardar";
-        btn.style.background = "";
-      }, 2500);
+      // Ocultar el marcador en la fila para que nadie lo copie
+      const fila = btn.closest("tr");
+      fila.cells[2].innerHTML = '<span class="pred-oculta">🔒 Apostado</span>';
+      fila.cells[3].innerHTML = '<span class="pred-oculta">🔒</span>';
+      fila.cells[4].innerHTML = '—';
+
+      // Toast de confirmación
+      const gol = primerGol && primerGol !== "Ninguno" ? primerGol : "Ninguno";
+      mostrarToast(`✅ ¡Guardado, ${jugador}!\n${local} ${predLocal} – ${predVisitante} ${visitante}  ·  1er gol: ${gol}`);
     } else {
       btn.textContent = "Error";
       btn.style.background = "#dc3545";
@@ -607,6 +616,15 @@ function mostrarUltimaActualizacion() {
   });
   document.getElementById("ultimaActualizacion").textContent =
     `Última actualización: ${fecha} a las ${hora}`;
+}
+
+// ─── Toast de confirmación ────────────────────────────────────────────────────
+function mostrarToast(mensaje) {
+  const toast = document.getElementById("toast");
+  toast.textContent = mensaje;
+  toast.classList.add("visible");
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove("visible"), 4500);
 }
 
 // ─── Arranque ─────────────────────────────────────────────────────────────────
